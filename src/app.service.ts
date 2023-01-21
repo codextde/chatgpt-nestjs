@@ -46,13 +46,13 @@ export class AppService implements OnModuleInit {
     let response: string | undefined;
     if (!conversationId) {
       response = await this.api.sendMessage(message, {
-        timeoutMs: 2 * 60 * 1000,
+        timeoutMs: 15 * 60 * 1000,
       });
     } else {
       response = await this.api.sendMessage(message, {
         conversationId,
         parentMessageId,
-        timeoutMs: 2 * 60 * 1000,
+        timeoutMs: 15 * 60 * 1000,
       });
     }
     return response ?? '';

@@ -7,20 +7,12 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get('/sendMessage')
-  sendMessage(
-    @Query('text') text,
-    @Query('conversationId') conversationId,
-    @Query('messageId') messageId,
-  ) {
-    return this.appService.sendMessageQueue(text, conversationId, messageId);
+  sendMessage(@Query('text') text, @Query('conversationId') conversationId) {
+    return this.appService.sendMessageNew(text, conversationId);
   }
 
   @Post('/sendMessage')
-  sendPostMessage(
-    @Body('text') text,
-    @Query('conversationId') conversationId,
-    @Query('messageId') messageId,
-  ) {
-    return this.appService.sendMessageQueue(text, conversationId, messageId);
+  sendPostMessage(@Body('text') text, @Query('conversationId') conversationId) {
+    return this.appService.sendMessageNew(text, conversationId);
   }
 }

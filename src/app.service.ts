@@ -2,10 +2,10 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { dynamicImport } from 'tsimportlib';
 
 import { Cron, CronExpression } from '@nestjs/schedule';
+import ChatGPT from 'chatgpt-io';
 
 @Injectable()
 export class AppService implements OnModuleInit {
-  queue = new PromiseQueue();
   // ChatGPT User
   config = {
     email: process.env.EMAIL,
@@ -18,16 +18,22 @@ export class AppService implements OnModuleInit {
 
   api: any;
   bot: any;
+  botNew: ChatGPT;
 
   @Cron(CronExpression.EVERY_HOUR)
   async handleCron() {
     if (this.api) {
-      await this.api.refreshSession();
+      // await this.api.refreshSession();
     }
   }
 
   async onModuleInit() {
-    await this.initChatGPT();
+    const chatGPT = (await dynamicImport(
+      'chatgpt-io',
+      module,
+    )) as typeof import('chatgpt-io');
+    this.botNew = new chatGPT.default(process.env.SESSION_TOKEN);
+    await this.botNew.waitForReady();
   }
 
   async initChatGPT() {
@@ -37,16 +43,6 @@ export class AppService implements OnModuleInit {
     )) as typeof import('chatgpt');
     this.api = new chatgpt.ChatGPTAPIBrowser(this.config);
     await this.api.initSession();
-  }
-
-  async sendMessageQueue(
-    message: string,
-    conversationId: string | undefined,
-    parentMessageId: string | undefined,
-  ) {
-    return this.queue.add(
-      this.sendMessage(message, conversationId, parentMessageId),
-    );
   }
 
   async sendMessage(
@@ -68,21 +64,17 @@ export class AppService implements OnModuleInit {
     }
     return response ?? '';
   }
-}
 
-class PromiseQueue {
-  private queue: Array<Promise<any>> = [];
-
-  add(promise: Promise<any>) {
-    this.queue.push(promise);
-    this.processQueue();
-  }
-
-  private async processQueue() {
-    if (this.queue.length > 0) {
-      const promise = this.queue.shift();
-      await promise;
-      this.processQueue();
+  async sendMessageNew(
+    message: string,
+    conversationId: string | undefined,
+  ): Promise<string> {
+    let response: string | undefined;
+    if (!conversationId) {
+      response = await this.botNew.ask(message);
+    } else {
+      response = await this.botNew.ask(message, conversationId);
     }
+    return response ?? '';
   }
 }

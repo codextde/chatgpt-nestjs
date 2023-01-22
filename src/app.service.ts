@@ -3,6 +3,7 @@ import { dynamicImport } from 'tsimportlib';
 
 import { Cron, CronExpression } from '@nestjs/schedule';
 import ChatGPT from 'chatgpt-io';
+import { ChatGPTAPIBrowser, ChatResponse } from 'chatgpt';
 
 @Injectable()
 export class AppService implements OnModuleInit {
@@ -16,24 +17,29 @@ export class AppService implements OnModuleInit {
     nopechaKey: process.env.NOPECHA_KEY,
   };
 
-  api: any;
-  bot: any;
+  api: ChatGPTAPIBrowser;
   botNew: ChatGPT;
+
+  newBot: boolean = false;
 
   @Cron(CronExpression.EVERY_HOUR)
   async handleCron() {
-    if (this.api) {
-      // await this.api.refreshSession();
+    if (this.api && !this.newBot) {
+      await this.api.refreshSession();
     }
   }
 
   async onModuleInit() {
-    const chatGPT = (await dynamicImport(
-      'chatgpt-io',
-      module,
-    )) as typeof import('chatgpt-io');
-    this.botNew = new chatGPT.default(process.env.SESSION_TOKEN);
-    await this.botNew.waitForReady();
+    if (this.newBot) {
+      const chatGPT = (await dynamicImport(
+        'chatgpt-io',
+        module,
+      )) as typeof import('chatgpt-io');
+      this.botNew = new chatGPT.default(process.env.SESSION_TOKEN);
+      await this.botNew.waitForReady();
+    } else {
+      this.initChatGPT();
+    }
   }
 
   async initChatGPT() {
@@ -48,33 +54,37 @@ export class AppService implements OnModuleInit {
   async sendMessage(
     message: string,
     conversationId: string | undefined,
-    parentMessageId: string | undefined,
-  ): Promise<string> {
-    let response: string | undefined;
+  ): Promise<ChatResponse> {
+    let response: ChatResponse | undefined;
     if (!conversationId) {
-      response = await this.api.sendMessage(message, {
-        timeoutMs: 15 * 60 * 1000,
-      });
+      if(this.newBot) {
+        const answer = await this.botNew.ask(message);
+        response = {
+          response: answer,
+          conversationId: "string",
+          messageId: "string"
+        }
+      } else {
+        response = await this.api.sendMessage(message, {
+          timeoutMs: 15 * 60 * 1000,
+        });
+      }
     } else {
-      response = await this.api.sendMessage(message, {
-        conversationId,
-        parentMessageId,
-        timeoutMs: 15 * 60 * 1000,
-      });
+      if(this.newBot) {
+        const answer = await this.botNew.ask(message, conversationId);
+        response = {
+          response: answer,
+          conversationId: "string",
+          messageId: "string"
+        }
+      } else {
+        response = await this.api.sendMessage(message, {
+          conversationId,
+          timeoutMs: 15 * 60 * 1000,
+        });
+      }
     }
-    return response ?? '';
+    return response;
   }
 
-  async sendMessageNew(
-    message: string,
-    conversationId: string | undefined,
-  ): Promise<string> {
-    let response: string | undefined;
-    if (!conversationId) {
-      response = await this.botNew.ask(message);
-    } else {
-      response = await this.botNew.ask(message, conversationId);
-    }
-    return response ?? '';
-  }
 }

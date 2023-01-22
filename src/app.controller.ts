@@ -8,11 +8,11 @@ export class AppController {
 
   @Get('/sendMessage')
   sendMessage(@Query('text') text, @Query('conversationId') conversationId) {
-    return this.appService.sendMessageNew(text, conversationId);
+    return this.appService.sendMessage(text, conversationId);
   }
 
   @Post('/sendMessage')
   sendPostMessage(@Body('text') text, @Query('conversationId') conversationId) {
-    return this.appService.sendMessageNew(text, conversationId);
+    return this.appService.sendMessage(text, conversationId);
   }
 }

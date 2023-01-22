@@ -5,6 +5,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class AppService implements OnModuleInit {
+  queue = new PromiseQueue();
   // ChatGPT User
   config = {
     email: process.env.EMAIL,
@@ -38,6 +39,16 @@ export class AppService implements OnModuleInit {
     await this.api.initSession();
   }
 
+  async sendMessageQueue(
+    message: string,
+    conversationId: string | undefined,
+    parentMessageId: string | undefined,
+  ) {
+    return this.queue.add(
+      this.sendMessage(message, conversationId, parentMessageId),
+    );
+  }
+
   async sendMessage(
     message: string,
     conversationId: string | undefined,
@@ -56,5 +67,22 @@ export class AppService implements OnModuleInit {
       });
     }
     return response ?? '';
+  }
+}
+
+class PromiseQueue {
+  private queue: Array<Promise<any>> = [];
+
+  add(promise: Promise<any>) {
+    this.queue.push(promise);
+    this.processQueue();
+  }
+
+  private async processQueue() {
+    if (this.queue.length > 0) {
+      const promise = this.queue.shift();
+      await promise;
+      this.processQueue();
+    }
   }
 }

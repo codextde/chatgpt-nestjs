@@ -12,7 +12,7 @@ export class AppController {
     @Query('conversationId') conversationId,
     @Query('messageId') messageId,
   ) {
-    return this.appService.sendMessage(text, conversationId, messageId);
+    return this.appService.sendMessageQueue(text, conversationId, messageId);
   }
 
   @Post('/sendMessage')
@@ -21,6 +21,6 @@ export class AppController {
     @Query('conversationId') conversationId,
     @Query('messageId') messageId,
   ) {
-    return this.appService.sendMessage(text, conversationId, messageId);
+    return this.appService.sendMessageQueue(text, conversationId, messageId);
   }
 }

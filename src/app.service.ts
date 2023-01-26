@@ -20,7 +20,7 @@ export class AppService implements OnModuleInit {
   api: ChatGPTAPIBrowser;
   botNew: ChatGPT;
 
-  newBot: boolean = false;
+  newBot: boolean = true;
 
   @Cron(CronExpression.EVERY_HOUR)
   async handleCron() {

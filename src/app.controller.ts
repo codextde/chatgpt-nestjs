@@ -21,8 +21,12 @@ export class AppController {
   }
 
   @Get('/v2')
-  test(@Query('text') text) {
-    console.log('test');
+  v2(@Query('text') text) {
+    return this.chatGptService.sendMessage(text);
+  }
+
+  @Post('/v2')
+  v2Post(@Body('text') text) {
     return this.chatGptService.sendMessage(text);
   }
 }

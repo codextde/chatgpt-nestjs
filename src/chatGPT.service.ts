@@ -24,16 +24,13 @@ export class ChatGPTService implements OnModuleInit {
       model: 'text-chat-davinci-002-20230126',
     };
 
-    this.bot = new chatGPT.default(
-      process.env.OPENAI_KEY,
-      options,
-    );
+    this.bot = new chatGPT.default(process.env.OPENAI_KEY, options);
   }
 
   async sendMessage(message: string) {
     console.log('Test', message);
     let response = await this.bot.ask(message);
     console.log('response', response);
-    return response;
+    return { response, code: 200 };
   }
 }

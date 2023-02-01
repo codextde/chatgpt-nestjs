@@ -57,26 +57,26 @@ export class AppService implements OnModuleInit {
   ): Promise<ChatResponse> {
     let response: ChatResponse | undefined;
     if (!conversationId) {
-      if(this.newBot) {
+      if (this.newBot) {
         const answer = await this.botNew.ask(message);
         response = {
           response: answer,
-          conversationId: "string",
-          messageId: "string"
-        }
+          conversationId: 'string',
+          messageId: 'string',
+        };
       } else {
         response = await this.api.sendMessage(message, {
           timeoutMs: 15 * 60 * 1000,
         });
       }
     } else {
-      if(this.newBot) {
+      if (this.newBot) {
         const answer = await this.botNew.ask(message, conversationId);
         response = {
           response: answer,
-          conversationId: "string",
-          messageId: "string"
-        }
+          conversationId: 'string',
+          messageId: 'string',
+        };
       } else {
         response = await this.api.sendMessage(message, {
           conversationId,
@@ -86,5 +86,4 @@ export class AppService implements OnModuleInit {
     }
     return response;
   }
-
 }

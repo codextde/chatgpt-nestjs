@@ -31,6 +31,6 @@ export class ChatGPTService implements OnModuleInit {
     console.log('Test', message);
     let response = await this.bot.ask(message);
     console.log('response', response);
-    return { response, code: 200 };
+    return { data: response, code: 200 };
   }
 }

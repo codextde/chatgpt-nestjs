@@ -3,7 +3,7 @@ import { dynamicImport } from 'tsimportlib';
 
 import { Cron, CronExpression } from '@nestjs/schedule';
 import ChatGPT from 'chatgpt-io';
-import { ChatGPTAPIBrowser, ChatResponse } from 'chatgpt';
+import { ChatGPTAPI } from 'chatgpt';
 
 @Injectable()
 export class AppService implements OnModuleInit {
@@ -17,16 +17,17 @@ export class AppService implements OnModuleInit {
     nopechaKey: process.env.NOPECHA_KEY,
   };
 
-  api: ChatGPTAPIBrowser;
+  // api: ChatGPTAPIBrowser;
+  bot: ChatGPTAPI;
   botNew: ChatGPT;
 
-  newBot: boolean = true;
+  newBot: boolean = false;
 
   @Cron(CronExpression.EVERY_HOUR)
   async handleCron() {
-    if (this.api && !this.newBot) {
-      await this.api.refreshSession();
-    }
+    //if (this.api && !this.newBot) {
+      // await this.api.refreshSession();
+    //}
   }
 
   async onModuleInit() {
@@ -47,15 +48,19 @@ export class AppService implements OnModuleInit {
       'chatgpt',
       module,
     )) as typeof import('chatgpt');
-    this.api = new chatgpt.ChatGPTAPIBrowser(this.config);
-    await this.api.initSession();
+    //this.api = new chatgpt.ChatGPTAPIBrowser(this.config);
+    
+    this.bot = new chatgpt.ChatGPTAPI({
+      apiKey: process.env.OPENAI_KEY
+    })
+    // await this.api.initSession();
   }
 
   async sendMessage(
     message: string,
     conversationId: string | undefined,
-  ): Promise<ChatResponse> {
-    let response: ChatResponse | undefined;
+  ): Promise<any> {
+    let response: any | undefined;
     if (!conversationId) {
       if (this.newBot) {
         const answer = await this.botNew.ask(message);
@@ -65,7 +70,7 @@ export class AppService implements OnModuleInit {
           messageId: 'string',
         };
       } else {
-        response = await this.api.sendMessage(message, {
+        response = await this.bot.sendMessage(message, {
           timeoutMs: 15 * 60 * 1000,
         });
       }
@@ -78,7 +83,7 @@ export class AppService implements OnModuleInit {
           messageId: 'string',
         };
       } else {
-        response = await this.api.sendMessage(message, {
+        response = await this.bot.sendMessage(message, {
           conversationId,
           timeoutMs: 15 * 60 * 1000,
         });

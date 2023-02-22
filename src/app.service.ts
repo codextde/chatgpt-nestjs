@@ -3,7 +3,7 @@ import { dynamicImport } from 'tsimportlib';
 
 import { Cron, CronExpression } from '@nestjs/schedule';
 import ChatGPT from 'chatgpt-io';
-import { ChatGPTAPI } from 'chatgpt';
+import { ChatGPTAPI, ChatGPTUnofficialProxyAPI } from 'chatgpt';
 
 @Injectable()
 export class AppService implements OnModuleInit {
@@ -18,7 +18,7 @@ export class AppService implements OnModuleInit {
   };
 
   // api: ChatGPTAPIBrowser;
-  bot: ChatGPTAPI;
+  bot: ChatGPTUnofficialProxyAPI;
   botNew: ChatGPT;
 
   newBot: boolean = false;
@@ -49,9 +49,10 @@ export class AppService implements OnModuleInit {
       module,
     )) as typeof import('chatgpt');
     //this.api = new chatgpt.ChatGPTAPIBrowser(this.config);
-    
-    this.bot = new chatgpt.ChatGPTAPI({
-      apiKey: process.env.OPENAI_KEY
+
+    this.bot = new chatgpt.ChatGPTUnofficialProxyAPI({
+      accessToken: process.env.ACCESS_TOKEN,
+      model: 'text-davinci-002-render-sha'
     })
     // await this.api.initSession();
   }

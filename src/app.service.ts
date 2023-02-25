@@ -1,60 +1,44 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { dynamicImport } from 'tsimportlib';
-
 import { Cron, CronExpression } from '@nestjs/schedule';
-import ChatGPT from 'chatgpt-io';
-import { ChatGPTAPI, ChatGPTUnofficialProxyAPI } from 'chatgpt';
+import { ChatGPTUnofficialProxyAPI } from 'chatgpt';
 
 @Injectable()
 export class AppService implements OnModuleInit {
-  // ChatGPT User
-  config = {
-    email: process.env.EMAIL,
-    password: process.env.PASSWORD,
-    debug: false,
-    minimize: true,
-    markdown: true,
-    nopechaKey: process.env.NOPECHA_KEY,
-  };
-
-  // api: ChatGPTAPIBrowser;
   bot: ChatGPTUnofficialProxyAPI;
-  botNew: ChatGPT;
-
-  newBot: boolean = false;
+  openaiAuthenticator: any;
+  chatGpt: any;
 
   @Cron(CronExpression.EVERY_HOUR)
   async handleCron() {
-    //if (this.api && !this.newBot) {
-      // await this.api.refreshSession();
-    //}
+    this.refreshToken();
   }
 
   async onModuleInit() {
-    if (this.newBot) {
-      const chatGPT = (await dynamicImport(
-        'chatgpt-io',
-        module,
-      )) as typeof import('chatgpt-io');
-      this.botNew = new chatGPT.default(process.env.SESSION_TOKEN);
-      await this.botNew.waitForReady();
-    } else {
-      this.initChatGPT();
-    }
-  }
-
-  async initChatGPT() {
-    const chatgpt = (await dynamicImport(
+    this.openaiAuthenticator = (await dynamicImport(
+      'openai-authenticator',
+      module,
+    )) as typeof import('openai-authenticator');
+    this.chatGpt = (await dynamicImport(
       'chatgpt',
       module,
     )) as typeof import('chatgpt');
-    //this.api = new chatgpt.ChatGPTAPIBrowser(this.config);
 
-    this.bot = new chatgpt.ChatGPTUnofficialProxyAPI({
-      accessToken: process.env.ACCESS_TOKEN,
-      model: 'text-davinci-002-render-sha'
-    })
-    // await this.api.initSession();
+
+    this.refreshToken();
+  }
+
+  async refreshToken(): Promise<void> {
+    const data = await this.getAccessToken();
+    this.bot = new this.chatGpt.ChatGPTUnofficialProxyAPI({
+      accessToken: data.accessToken,
+      model: 'text-davinci-002-render-sha',
+    });
+  }
+
+  async getAccessToken(): Promise<{ accessToken: string }> {
+    const authenticator = new this.openaiAuthenticator.default();
+    return authenticator.login(process.env.EMAIL, process.env.PASSWORD);
   }
 
   async sendMessage(
@@ -62,33 +46,15 @@ export class AppService implements OnModuleInit {
     conversationId: string | undefined,
   ): Promise<any> {
     let response: any | undefined;
-    if (!conversationId) {
-      if (this.newBot) {
-        const answer = await this.botNew.ask(message);
-        response = {
-          response: answer,
-          conversationId: 'string',
-          messageId: 'string',
-        };
-      } else {
-        response = await this.bot.sendMessage(message, {
-          timeoutMs: 15 * 60 * 1000,
-        });
-      }
+    if (conversationId) {
+      response = await this.bot.sendMessage(message, {
+        conversationId,
+        timeoutMs: 15 * 60 * 1000,
+      });
     } else {
-      if (this.newBot) {
-        const answer = await this.botNew.ask(message, conversationId);
-        response = {
-          response: answer,
-          conversationId: 'string',
-          messageId: 'string',
-        };
-      } else {
-        response = await this.bot.sendMessage(message, {
-          conversationId,
-          timeoutMs: 15 * 60 * 1000,
-        });
-      }
+      response = await this.bot.sendMessage(message, {
+        timeoutMs: 15 * 60 * 1000,
+      });
     }
     return response;
   }

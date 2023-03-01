@@ -34,6 +34,7 @@ export class AppService implements OnModuleInit {
       accessToken: data.accessToken,
       model: 'text-davinci-002-render-sha',
     });
+    console.log('Authenticated with OpenAI');
   }
 
   async getAccessToken(): Promise<{ accessToken: string }> {

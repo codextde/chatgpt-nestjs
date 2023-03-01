@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Query } from '@nestjs/common';
+import { Controller, ForbiddenException, Get, HttpException, HttpStatus, Post, Query } from '@nestjs/common';
 import { Body } from '@nestjs/common/decorators';
 import { AppService } from './app.service';
 
@@ -9,12 +9,18 @@ export class AppController {
   ) {}
 
   @Get('/message')
-  sendMessage(@Query('text') text, @Query('conversationId') conversationId) {
+  sendMessage(@Query('text') text, @Query('conversationId') conversationId, @Query('authKey') authKey) {
+    if(authKey !== process.env.AUTH_KEY) {
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    }
     return this.appService.sendMessage(text, conversationId);
   }
 
   @Post('/message')
-  sendPostMessage(@Body('text') text, @Query('conversationId') conversationId) {
+  sendPostMessage(@Body('text') text, @Query('conversationId') conversationId, @Query('authKey') authKey) {
+    if(authKey !== process.env.AUTH_KEY) {
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    }
     return this.appService.sendMessage(text, conversationId);
   }
 

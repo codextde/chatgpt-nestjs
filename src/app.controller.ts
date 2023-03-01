@@ -1,32 +1,21 @@
 import { Controller, Get, Post, Query } from '@nestjs/common';
 import { Body } from '@nestjs/common/decorators';
 import { AppService } from './app.service';
-import { ChatGPTService } from './chatGPT.service';
 
 @Controller()
 export class AppController {
   constructor(
-    private readonly appService: AppService,
-    private readonly chatGptService: ChatGPTService,
+    private readonly appService: AppService
   ) {}
 
-  @Get('/sendMessage')
+  @Get('/message')
   sendMessage(@Query('text') text, @Query('conversationId') conversationId) {
     return this.appService.sendMessage(text, conversationId);
   }
 
-  @Post('/sendMessage')
+  @Post('/message')
   sendPostMessage(@Body('text') text, @Query('conversationId') conversationId) {
     return this.appService.sendMessage(text, conversationId);
   }
 
-  @Get('/v2')
-  v2(@Query('text') text) {
-    return this.chatGptService.sendMessage(text);
-  }
-
-  @Post('/v2')
-  v2Post(@Body('text') text) {
-    return this.chatGptService.sendMessage(text);
-  }
 }

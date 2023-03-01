@@ -43,7 +43,7 @@ export class AppService implements OnModuleInit {
 
   async sendMessage(
     message: string,
-    conversationId: string | undefined,
+    conversationId?: string | undefined,
   ): Promise<any> {
     let response: any | undefined;
     if (conversationId) {

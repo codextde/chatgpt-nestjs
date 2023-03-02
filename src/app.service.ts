@@ -45,11 +45,13 @@ export class AppService implements OnModuleInit {
   async sendMessage(
     message: string,
     conversationId?: string | undefined,
+    parentMessageId?: string | undefined,
   ): Promise<any> {
     let response: any | undefined;
-    if (conversationId) {
+    if (conversationId && parentMessageId) {
       response = await this.bot.sendMessage(message, {
         conversationId,
+        parentMessageId,
         timeoutMs: 15 * 60 * 1000,
       });
     } else {

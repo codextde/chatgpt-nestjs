@@ -1,11 +1,12 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { dynamicImport } from 'tsimportlib';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { ChatGPTUnofficialProxyAPI } from 'chatgpt';
+import { ChatGPTAPI, ChatGPTUnofficialProxyAPI } from 'chatgpt';
 
 @Injectable()
 export class AppService implements OnModuleInit {
   bot: ChatGPTUnofficialProxyAPI;
+  openAiBot: ChatGPTAPI
   openaiAuthenticator: any;
   chatGpt: any;
 
@@ -34,6 +35,9 @@ export class AppService implements OnModuleInit {
       accessToken: data.accessToken,
       model: 'text-davinci-002-render-sha',
     });
+    this.openAiBot = new this.chatGpt.ChatGPTAPI({
+      apiKey: process.env.OPENAI_API_KEY
+    })
     console.log('Authenticated with OpenAI');
   }
 
@@ -48,17 +52,35 @@ export class AppService implements OnModuleInit {
     parentMessageId?: string | undefined,
   ): Promise<any> {
     let response: any | undefined;
-    if (conversationId && parentMessageId) {
-      response = await this.bot.sendMessage(message, {
-        conversationId,
-        parentMessageId,
-        timeoutMs: 15 * 60 * 1000,
-      });
-    } else {
-      response = await this.bot.sendMessage(message, {
-        timeoutMs: 15 * 60 * 1000,
-      });
+    try {
+      if (conversationId && parentMessageId) {
+        response = await this.bot.sendMessage(message, {
+          conversationId,
+          parentMessageId,
+          timeoutMs: 15 * 60 * 1000,
+        });
+      } else {
+        response = await this.bot.sendMessage(message, {
+          timeoutMs: 15 * 60 * 1000,
+        });
+      }
+    } catch (error) {
+      if (error.statusCode === 403) {
+        if (parentMessageId) {
+          response = await this.openAiBot.sendMessage(message, {
+            parentMessageId,
+            timeoutMs: 15 * 60 * 1000,
+          });
+        } else {
+          response = await this.openAiBot.sendMessage(message, {
+            timeoutMs: 15 * 60 * 1000,
+          });
+        }
+      }
+      console.log('1error: ', error);
     }
+
+   
     return response;
   }
 }

@@ -34,6 +34,7 @@ export class AppService implements OnModuleInit {
     this.bot = new this.chatGpt.ChatGPTUnofficialProxyAPI({
       accessToken: data.accessToken,
       model: 'text-davinci-002-render-sha',
+      apiReverseProxyUrl: 'https://gpt.pawan.krd/backend-api/conversation'
     });
     this.openAiBot = new this.chatGpt.ChatGPTAPI({
       apiKey: process.env.OPENAI_API_KEY

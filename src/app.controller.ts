@@ -18,12 +18,13 @@ export class AppController {
   sendMessage(
     @Query('text') text,
     @Query('conversationId') conversationId,
+    @Query('parentMessageId') parentMessageId,
     @Query('authKey') authKey,
   ) {
     if (authKey !== process.env.AUTH_KEY) {
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
-    return this.appService.sendMessage(text, conversationId);
+    return this.appService.sendMessage(text, conversationId, parentMessageId);
   }
 
   @Post('/message')

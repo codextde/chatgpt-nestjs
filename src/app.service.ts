@@ -54,7 +54,17 @@ export class AppService implements OnModuleInit {
   ): Promise<any> {
     let response: any | undefined;
     try {
-      if (conversationId && parentMessageId) {
+      if (parentMessageId) {
+        response = await this.openAiBot.sendMessage(message, {
+          parentMessageId,
+          timeoutMs: 15 * 60 * 1000,
+        });
+      } else {
+        response = await this.openAiBot.sendMessage(message, {
+          timeoutMs: 15 * 60 * 1000,
+        });
+      }
+      /*if (conversationId && parentMessageId) {
         response = await this.bot.sendMessage(message, {
           conversationId,
           parentMessageId,
@@ -64,21 +74,8 @@ export class AppService implements OnModuleInit {
         response = await this.bot.sendMessage(message, {
           timeoutMs: 15 * 60 * 1000,
         });
-      }
+      }*/
     } catch (error) {
-      if (error.statusCode === 403) {
-        if (parentMessageId) {
-          response = await this.openAiBot.sendMessage(message, {
-            parentMessageId,
-            timeoutMs: 15 * 60 * 1000,
-          });
-        } else {
-          response = await this.openAiBot.sendMessage(message, {
-            timeoutMs: 15 * 60 * 1000,
-          });
-        }
-      }
-      console.log('1error: ', error);
     }
 
    

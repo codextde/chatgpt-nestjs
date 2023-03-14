@@ -33,7 +33,7 @@ export class AppService implements OnModuleInit {
     const data = await this.getAccessToken();
     this.bot = new this.chatGpt.ChatGPTUnofficialProxyAPI({
       accessToken: data.accessToken,
-      model: 'text-davinci-002-render-sha',
+      model: 'gpt-4',
       apiReverseProxyUrl: 'https://gpt.pawan.krd/backend-api/conversation'
     });
     this.openAiBot = new this.chatGpt.ChatGPTAPI({
@@ -55,12 +55,12 @@ export class AppService implements OnModuleInit {
     let response: any | undefined;
     try {
       if (parentMessageId) {
-        response = await this.openAiBot.sendMessage(message, {
+        response = await this.bot.sendMessage(message, {
           parentMessageId,
           timeoutMs: 15 * 60 * 1000,
         });
       } else {
-        response = await this.openAiBot.sendMessage(message, {
+        response = await this.bot.sendMessage(message, {
           timeoutMs: 15 * 60 * 1000,
         });
       }

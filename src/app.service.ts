@@ -5,10 +5,9 @@ import { ChatGPTAPI, ChatGPTUnofficialProxyAPI } from 'chatgpt';
 
 @Injectable()
 export class AppService implements OnModuleInit {
-  bot: ChatGPTUnofficialProxyAPI;
-  openAiBot: ChatGPTAPI
   openaiAuthenticator: any;
   chatGpt: any;
+  accessToken: string;
 
   @Cron(CronExpression.EVERY_HOUR)
   async handleCron() {
@@ -24,21 +23,12 @@ export class AppService implements OnModuleInit {
       'chatgpt',
       module,
     )) as typeof import('chatgpt');
-
-
     this.refreshToken();
   }
 
   async refreshToken(): Promise<void> {
     const data = await this.getAccessToken();
-    this.bot = new this.chatGpt.ChatGPTUnofficialProxyAPI({
-      accessToken: data.accessToken,
-      model: 'gpt-4',
-      apiReverseProxyUrl: 'https://gpt.pawan.krd/backend-api/conversation'
-    });
-    this.openAiBot = new this.chatGpt.ChatGPTAPI({
-      apiKey: process.env.OPENAI_API_KEY
-    })
+    this.accessToken = data.accessToken;
     console.log('Authenticated with OpenAI');
   }
 
@@ -51,34 +41,47 @@ export class AppService implements OnModuleInit {
     message: string,
     conversationId?: string | undefined,
     parentMessageId?: string | undefined,
+    chatGpt: boolean = false,
+    model: string = 'text-davinci-002-render-sha',
   ): Promise<any> {
     let response: any | undefined;
     try {
-      if (parentMessageId) {
-        response = await this.bot.sendMessage(message, {
-          parentMessageId,
-          timeoutMs: 15 * 60 * 1000,
-        });
+      if (chatGpt) {
+        const bot: ChatGPTUnofficialProxyAPI =
+          new this.chatGpt.ChatGPTUnofficialProxyAPI({
+            accessToken: this.accessToken,
+            model: model,
+            apiReverseProxyUrl:
+              'https://gpt.pawan.krd/backend-api/conversation',
+          });
+        if (conversationId && parentMessageId) {
+          response = await bot.sendMessage(message, {
+            conversationId,
+            parentMessageId,
+            timeoutMs: 15 * 60 * 1000,
+          });
+        } else {
+          response = await bot.sendMessage(message, {
+            timeoutMs: 15 * 60 * 1000,
+          });
+        }
       } else {
-        response = await this.bot.sendMessage(message, {
-          timeoutMs: 15 * 60 * 1000,
+        const openAiBot: ChatGPTAPI = new this.chatGpt.ChatGPTAPI({
+          apiKey: process.env.OPENAI_API_KEY,
         });
-      }
-      /*if (conversationId && parentMessageId) {
-        response = await this.bot.sendMessage(message, {
-          conversationId,
-          parentMessageId,
-          timeoutMs: 15 * 60 * 1000,
-        });
-      } else {
-        response = await this.bot.sendMessage(message, {
-          timeoutMs: 15 * 60 * 1000,
-        });
-      }*/
-    } catch (error) {
-    }
 
-   
+        if (parentMessageId) {
+          response = await openAiBot.sendMessage(message, {
+            parentMessageId,
+            timeoutMs: 15 * 60 * 1000,
+          });
+        } else {
+          response = await openAiBot.sendMessage(message, {
+            timeoutMs: 15 * 60 * 1000,
+          });
+        }
+      }
+    } catch (error) {}
     return response;
   }
 }

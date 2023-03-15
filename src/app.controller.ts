@@ -18,11 +18,14 @@ export class AppController {
     @Query('conversationId') conversationId,
     @Query('parentMessageId') parentMessageId,
     @Query('authKey') authKey,
+    @Query('chatGpt') chatGpt,
+    @Query('model') model,
+
   ) {
     if (authKey !== process.env.AUTH_KEY) {
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
-    return this.appService.sendMessage(text, conversationId, parentMessageId);
+    return this.appService.sendMessage(text, conversationId, parentMessageId, chatGpt, model);
   }
 
   @Post('/message')
@@ -31,10 +34,12 @@ export class AppController {
     @Body('conversationId') conversationId,
     @Body('parentMessageId') parentMessageId,
     @Query('authKey') authKey,
+    @Query('chatGpt') chatGpt,
+    @Query('model') model,
   ) {
     if (authKey !== process.env.AUTH_KEY) {
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
-    return this.appService.sendMessage(text, conversationId, parentMessageId);
+    return this.appService.sendMessage(text, conversationId, parentMessageId, chatGpt, model);
   }
 }

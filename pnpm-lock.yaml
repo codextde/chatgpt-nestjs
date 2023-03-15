@@ -10,7 +10,7 @@ specifiers:
   '@nestjs/schematics': ^9.0.4
   '@nestjs/testing': ^9.3.9
   '@types/express': ^4.17.17
-  '@types/jest': 29.4.1
+  '@types/jest': 29.4.2
   '@types/node': ^18.15.3
   '@types/supertest': ^2.0.12
   '@typescript-eslint/eslint-plugin': ^5.55.0
@@ -67,7 +67,7 @@ devDependencies:
   '@nestjs/schematics': 9.0.4_typescript@4.9.5
   '@nestjs/testing': 9.3.9_yqmogfxzeu633isbftgaoi4ho4
   '@types/express': 4.17.17
-  '@types/jest': 29.4.1
+  '@types/jest': 29.4.2
   '@types/node': 18.15.3
   '@types/supertest': 2.0.12
   '@typescript-eslint/eslint-plugin': 5.55.0_342y7v4tc7ytrrysmit6jo4wri
@@ -848,18 +848,6 @@ packages:
       - supports-color
     dev: true
 
-  /@jest/types/29.4.3:
-    resolution: {integrity: sha512-bPYfw8V65v17m2Od1cv44FH+SiKW7w2Xu7trhcdTLUmSv85rfKsP+qXSjO4KGJr4dtPSzl/gvslZBXctf1qGEA==}
-    engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
-    dependencies:
-      '@jest/schemas': 29.4.3
-      '@types/istanbul-lib-coverage': 2.0.4
-      '@types/istanbul-reports': 3.0.1
-      '@types/node': 18.15.3
-      '@types/yargs': 17.0.20
-      chalk: 4.1.2
-    dev: true
-
   /@jest/types/29.5.0:
     resolution: {integrity: sha512-qbu7kN6czmVRc3xWFQcAN03RAUamgppVUdXrvl1Wr3jlNF93o9mJbGcDWrwGB6ht44u7efB1qCFgVQmca24Uog==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
@@ -1300,8 +1288,8 @@ packages:
       '@types/istanbul-lib-report': 3.0.0
     dev: true
 
-  /@types/jest/29.4.1:
-    resolution: {integrity: sha512-zDQSWXG+ZkEvs2zFFMszePhx4euKz+Yt3Gg1P+RHjfJBinTTr6L2DEyovO4V/WrKXuF0Dgn56GWGZPDa6TW9eQ==}
+  /@types/jest/29.4.2:
+    resolution: {integrity: sha512-bbne90W7is+m88ezmZrLiTpp41tIoTdvPC5t3gLoNgu/6qbGdWTC2JWqPWQRJn2Q7rVYTr8aTWqOjhGJDXyvAQ==}
     dependencies:
       expect: 29.5.0
       pretty-format: 29.5.0
@@ -3927,7 +3915,7 @@ packages:
     resolution: {integrity: sha512-7YOVZaiX7RJLv76ZfHt4nbNEzzTRiMW/IiOG7ZOKmTXmoGBxUDefgMAxQubu6WPVqP5zSzAdZG0FfLcC7HOIFQ==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dependencies:
-      '@jest/types': 29.4.3
+      '@jest/types': 29.5.0
       '@types/node': 18.15.3
       chalk: 4.1.2
       ci-info: 3.7.1

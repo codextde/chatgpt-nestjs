@@ -44,6 +44,8 @@ export class AppService implements OnModuleInit {
     chatGpt: boolean = false,
     model: string = 'text-davinci-002-render-sha',
   ): Promise<any> {
+    console.log('chatGpt', chatGpt);
+    console.log('model', model);
     let response: any | undefined;
     try {
       if (chatGpt) {
@@ -81,7 +83,9 @@ export class AppService implements OnModuleInit {
           });
         }
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log('error', error);
+    }
     return response;
   }
 }

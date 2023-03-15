@@ -25,6 +25,7 @@ export class AppController {
     if (authKey !== process.env.AUTH_KEY) {
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
+    chatGpt == 'true' ? chatGpt = true : chatGpt = false;
     return this.appService.sendMessage(text, conversationId, parentMessageId, chatGpt, model);
   }
 
@@ -40,6 +41,7 @@ export class AppController {
     if (authKey !== process.env.AUTH_KEY) {
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
+    chatGpt == 'true' ? chatGpt = true : chatGpt = false;
     return this.appService.sendMessage(text, conversationId, parentMessageId, chatGpt, model);
   }
 }

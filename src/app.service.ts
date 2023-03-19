@@ -48,6 +48,7 @@ export class AppService implements OnModuleInit {
     console.log('model', model);
     let response: any | undefined;
     try {
+      chatGpt = false;
       if (chatGpt) {
         const bot: ChatGPTUnofficialProxyAPI =
           new this.chatGpt.ChatGPTUnofficialProxyAPI({

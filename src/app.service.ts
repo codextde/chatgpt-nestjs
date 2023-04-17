@@ -11,7 +11,7 @@ export class AppService implements OnModuleInit {
 
   @Cron(CronExpression.EVERY_HOUR)
   async handleCron() {
-    this.refreshToken();
+    // this.refreshToken();
   }
 
   async onModuleInit() {
@@ -23,7 +23,7 @@ export class AppService implements OnModuleInit {
       'chatgpt',
       module,
     )) as typeof import('chatgpt');
-    this.refreshToken();
+    // this.refreshToken();
   }
 
   async refreshToken(): Promise<void> {
